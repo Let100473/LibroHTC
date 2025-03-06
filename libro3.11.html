@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hackea tu Cerebro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.71/vfs_fonts.js"></script>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .book-container {
+            position: relative;
+            width: 80vw;
+            max-width: 600px;
+            height: 80vh;
+            max-height: 700px;
+            perspective: 1200px;
+        }
+        .book {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: black;
+            color: white;
+            box-shadow: 5px 5px 15px rgba(255, 165, 0, 0.5);
+            transform-origin: left center;
+            transition: transform 1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .page-content {
+            text-align: left;
+            line-height: 1.6;
+            max-width: 90%;
+            font-size: 1.1rem;
+            margin: 0 auto;
+        }
+        h2 {
+            color: orange;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        .flip-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: orange;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .download-btn {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: orange;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .start-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            transform: translateX(-50%);
+            background: orange;
+            color: black;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="book-container">
+        <div class="book" id="book"></div>
+        <button class="download-btn" onclick="descargarPDF()">Descargar PDF</button>
+    </div>
+    <script>
+        const book = document.getElementById('book');
+        const paginas = [
+            {titulo: 'Hackea tu Cerebro', contenido: '¿Te gustaría aprender más rápido, concentrarte mejor y sacar el máximo provecho de tu cerebro? Aquí tienes un resumen de estrategias científicas que te ayudarán a mejorar tu productividad y aprovechar al máximo tu potencial.'},
+            {titulo: 'Tema 1: Aprende de Forma Efectiva', contenido: 'El aprendizaje no solo se trata de acumular información, sino de procesarla y darle un propósito útil en tu vida.\n\nPractica y repasa: Repetir y repasar fortalece las conexiones neuronales, mejorando tu capacidad para recordar y aplicar lo aprendido.\n\nAcepta los errores: Ver los tropiezos como oportunidades para crecer te ayudará a desarrollar tu potencial.\n\nDesmiente mitos: Aunque no usamos el 100% del cerebro al mismo tiempo, lo aprovechamos en su totalidad dependiendo de la actividad.'},
+            {titulo: 'Tema 2: Domina la Concentración', contenido: 'Para concentrarte de manera eficiente, necesitas cuidar tanto tu mente como tu entorno.\n\nMantén el estado de alerta: Descansar es esencial para estar enfocado. Puedes mejorar tu energía con:\nSiestas de 90 minutos: Restauran tu rendimiento cerebral.\nSiestas de 20 minutos con café: Toma café antes de dormir y despierta justo cuando la cafeína empieza a actuar.\nRespiración 4x4: Inhala, sostén y exhala durante 4 segundos para calmarte y enfocarte.\nOptimiza tu entorno: Crea un espacio que facilite tu concentración:\nUsa luz adecuada y colores calmantes como azul o verde.\nAñade plantas, aromas estimulantes (menta o romero) y música instrumental.\nInvierte en mobiliario ergonómico y activa el modo blanco y negro en tu celular para reducir distracciones.\nHaz una cosa a la vez: El multitasking afecta la memoria, genera errores y aumenta el estrés.\nAplica la Técnica Pomodoro: Trabaja 25 minutos sin distracciones y descansa 5. Repite el ciclo 4 veces y toma descansos más largos después.'},
+            {titulo: 'Tema 3: El Poder del Sueño y la Naturaleza', contenido: 'Dormir bien es esencial: Mientras duermes, las neuronas reactivan lo que aprendiste durante el día, consolidando la memoria. Para mejorar la calidad del sueño:\nSigue un horario regular.\nDuerme en un ambiente fresco, oscuro y sin ruido.\nEvita pantallas, comidas pesadas y cafeína antes de acostarte.\nIncorpora la naturaleza: Estudios demuestran que la naturaleza mejora la concentración y reduce el estrés. Integra elementos naturales en tu vida:\nRealiza caminatas al aire libre o con amigos.\nDecora tu espacio con plantas y sonidos naturales, como el canto de los pájaros o el murmullo del agua.'},
+            {titulo: 'Tema 4: Alimentación y Nootrópicos', contenido: 'Una dieta adecuada no solo te da energía, sino que también mejora tu capacidad cognitiva.\nClaves para comer bien:\nDesayuna alimentos salados en lugar de dulces para mantener estables tus niveles de energía.\nEmpieza las comidas con vegetales, añade limón o vinagre y da un paseo después de comer.\nPrioriza grasas saludables (aguacate, frutos secos), proteínas, vitamina B y hierro para nutrir tu cerebro.\nEvita: Azúcares añadidos, grasas trans y alcohol, que afectan la memoria y el aprendizaje.\nPotenciadores cognitivos naturales:\nArándanos, cacao y matcha son excelentes para mejorar la memoria, el enfoque y reducir el estrés.\nTip sobre el café: Espera una hora después de despertar para consumirlo y así maximizar sus beneficios.'},
+            {titulo: 'Tema 5: Ejercicio y Movimiento', contenido: 'El ejercicio mejora la memoria, la productividad y promueve la creación de nuevas neuronas gracias a la proteína BDNF.\nAlta intensidad (HIIT): Libera BDNF, fortaleciendo las conexiones cerebrales.\nMovimiento diario (NEAT): Si no puedes hacer ejercicio intenso, mantente activo:\nCamina, usa las escaleras o realiza tareas de pie mientras hablas por teléfono.'},
+            {titulo: 'Tema 6: Construye Hábitos Poderosos', contenido: 'Los hábitos son más que rutinas: son el motor que define tu éxito o fracaso.\nEl ciclo del hábito:\nSeñales: Identifica estímulos que te motiven, como dejar tus zapatillas deportivas visibles.\nRutinas: Repite la acción deseada, como salir a caminar.\nRecompensas: Celebra pequeños logros para reforzar el hábito.\nHazlos obvios: Usa señales visibles. Por ejemplo, deja tu botella de agua en un lugar estratégico para recordar beber más.\nSimplifica: Divide objetivos grandes en pasos pequeños y manejables.'},
+            {titulo: 'Tema 7: Memoria y Técnicas de Aprendizaje', contenido: 'Repetición espaciada: Estudia un poco cada día en lugar de hacerlo todo de una vez.\nUsa el dibujo: Representa visualmente conceptos complejos para facilitar su retención.\nAplica la mnemotecnia: Crea acrónimos, rimas o historias que te ayuden a recordar información importante.\nToma apuntes efectivos: Prueba métodos como Cornell o Feynman para organizar ideas y detectar lagunas en tu comprensión.\nRepasos activos con flashcards: Practica la recuperación activa para fortalecer tus recuerdos.'},
+            {titulo: 'Tema 8: Aprende con Diversión', contenido: 'El aprendizaje no tiene que ser serio todo el tiempo. La risa reduce el estrés, mejora tu estado de ánimo y hace la información más memorable. Además:\nUsa música instrumental para concentrarte.\nConvierte el aprendizaje en un juego o usa narrativas divertidas para retener conceptos más fácilmente.'},
+            {titulo: 'Conclusiones', contenido: 'Con estas estrategias basadas en neurociencia, puedes transformar tu manera de aprender y optimizar tu rendimiento mental. ¡Empieza a aplicarlas hoy y desbloquea tu máximo potencial!'},
+            {titulo: 'Bibliografía', contenido: 'Hackea tu cerebro\nNicolás Fernández Miranda\nEditorial LEA'}
+        ];
+        
+        paginas.forEach((p, index) => {
+            let page = document.createElement('div');
+            page.classList.add('page');
+            page.style.zIndex = paginas.length - index;
+            page.innerHTML = `<div class='page-content'><h2>${p.titulo}</h2><p>${p.contenido.replace(/\n/g, '<br>')}</p></div>`;
+            book.appendChild(page);
+            if (index < paginas.length - 1) {
+                let btnFlip = document.createElement('button');
+                btnFlip.classList.add('flip-btn');
+                btnFlip.innerText = 'Siguiente';
+                btnFlip.onclick = () => flipPage(index);
+                page.appendChild(btnFlip);
+            } else {
+                // Agregar botón de inicio en la última página
+                let btnInicio = document.createElement('button');
+                btnInicio.classList.add('start-btn');
+                btnInicio.innerText = 'Inicio';
+                btnInicio.onclick = () => location.reload(); // Vuelve a cargar la página inicial
+                page.appendChild(btnInicio);
+            }
+        });
+
+        function flipPage(index) {
+            const page = book.children[index];
+            const nextPage = book.children[index + 1];
+            page.style.transform = 'rotateY(-180deg)';
+            nextPage.style.transform = 'rotateY(0deg)';
+        }
+
+        function descargarPDF() {
+            const docDefinition = {
+                content: paginas.map(p => {
+                    return [
+                        { text: p.titulo, style: 'header' },
+                        { text: p.contenido.replace(/\n/g, '\n\n'), style: 'content' }
+                    ];
+                }).flat(),
+                styles: {
+                    header: { fontSize: 18, bold: true, color: 'orange', margin: [0, 20, 0, 10] },
+                    content: { fontSize: 12, margin: [0, 0, 0, 20] }
+                }
+            };
+            pdfMake.createPdf(docDefinition).download('Hackea_tu_Cerebro.pdf');
+        }
+    </script>
+</body>
+</html>
